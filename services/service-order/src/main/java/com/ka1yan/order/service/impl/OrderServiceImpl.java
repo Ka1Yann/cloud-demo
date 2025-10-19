@@ -7,6 +7,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,11 +24,13 @@ public class OrderServiceImpl implements OrderService {
     private RestTemplate restTemplate;
     @Resource
     private DiscoveryClient discoveryClient;
+    @Resource
+    private LoadBalancerClient loadBalancerClient;
 
     @Override
     public Order createOrder(Long productId, Long userId) {
         Order order = new Order();
-        Product productRemote = getProductRemote(productId);
+        Product productRemote = getProductRemoteWithLoadBalance(productId);
         if (productRemote == null) {
             return null;
         }
@@ -48,6 +51,13 @@ public class OrderServiceImpl implements OrderService {
         ServiceInstance instance = instances.get(0);
         String url = instance.getUri().toString() + "/product/" + productId;
         log.info("===>Received a rpc get-product request:{}", url);
+        return restTemplate.getForObject(url, Product.class);
+    }
+
+    private Product getProductRemoteWithLoadBalance(Long productId) {
+        ServiceInstance choose = loadBalancerClient.choose("service-product");
+        String url = choose.getUri().toString() + "/product/" + productId;
+        log.info("===>Received a load-balanced rpc get-product request:{}", url);
         return restTemplate.getForObject(url, Product.class);
     }
 }
