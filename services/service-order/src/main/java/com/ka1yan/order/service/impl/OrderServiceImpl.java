@@ -30,7 +30,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order createOrder(Long productId, Long userId) {
         Order order = new Order();
-        Product productRemote = getProductRemoteWithLoadBalance(productId);
+        Product productRemote = getProductRemoteWithLoadBalanceAnnotation(productId);
         if (productRemote == null) {
             return null;
         }
@@ -58,6 +58,12 @@ public class OrderServiceImpl implements OrderService {
         ServiceInstance choose = loadBalancerClient.choose("service-product");
         String url = choose.getUri().toString() + "/product/" + productId;
         log.info("===>Received a load-balanced rpc get-product request:{}", url);
+        return restTemplate.getForObject(url, Product.class);
+    }
+
+    private Product getProductRemoteWithLoadBalanceAnnotation(Long productId) {
+        String url = "http://service-product/product/" + productId;
+        log.info("===>Received a load-balanced-annotation rpc get-product request:{}", url);
         return restTemplate.getForObject(url, Product.class);
     }
 }
