@@ -1,0 +1,15 @@
+package com.ka1yan.order.properties;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Component
+@Data
+@ConfigurationProperties(prefix = "order")
+public class OrderProperties {
+
+    String timeout;
+
+    String autoConfirm;
+}
