@@ -4,7 +4,6 @@ import com.alibaba.cloud.nacos.NacosConfigManager;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 @Slf4j
 @SpringBootApplication
@@ -33,7 +31,7 @@ public class OrderMainApplication {
 
                 @Override
                 public void receiveConfigInfo(String configInfo) {
-                    log.warn("config info changing: \n{}", configInfo);
+                    log.warn( "config info changing: \n{}", configInfo);
                     System.out.println("do something...");
                 }
             });
